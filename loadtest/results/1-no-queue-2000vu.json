@@ -1,0 +1,89 @@
+{
+  "scenario": "1-no-queue",
+  "finishedAt": "2026-09-25T06:17:27.511Z",
+  "config": {
+    "vus": "2000",
+    "users": null,
+    "duration": null,
+    "qty": null,
+    "machine": "Ryzen 7 7445HS 6C/12T, 7.3GB RAM (Docker VM 3.5GB), 2x API + 2x worker, k6 di mesin yang sama"
+  },
+  "thresholds": {
+    "http_req_duration{name:naive_order}": {
+      "p(95)<800": {
+        "ok": false
+      }
+    },
+    "naive_system_error": {
+      "rate<0.01": {
+        "ok": false
+      }
+    }
+  },
+  "metrics": {
+    "http_reqs": {
+      "count": 9995,
+      "rate": 173.7153533160262
+    },
+    "http_req_failed": {
+      "rate": 0.5095547773886944,
+      "passes": 5093,
+      "fails": 4902
+    },
+    "http_req_duration": {
+      "avg": 7779.5061090520485,
+      "med": 7741.624119,
+      "p(90)": 11430.1241088,
+      "p(95)": 12163.9323513,
+      "p(99)": 12946.75186466,
+      "max": 17693.873091
+    },
+    "http_req_duration{name:naive_order}": {
+      "p(90)": 11430.227268600001,
+      "p(95)": 12163.98655405,
+      "p(99)": 12946.77540021,
+      "max": 17693.873091,
+      "avg": 7782.460023539164,
+      "med": 7741.9293425
+    },
+    "tickets_sold": {
+      "value": 0,
+      "min": 0,
+      "max": 0
+    },
+    "tickets_reserved": {
+      "value": 4897,
+      "min": 4897,
+      "max": 4897
+    },
+    "oversold_categories": {
+      "min": 0,
+      "max": 0,
+      "value": 0
+    },
+    "naive_system_error": {
+      "rate": 0.11071071071071072,
+      "passes": 1106,
+      "fails": 8884
+    },
+    "naive_sold_out": {
+      "passes": 3987,
+      "fails": 6003,
+      "rate": 0.3990990990990991
+    },
+    "checks": {
+      "rate": 0.49019019019019017,
+      "passes": 4897,
+      "fails": 5093
+    },
+    "vus_max": {
+      "value": 2000,
+      "min": 856,
+      "max": 2000
+    },
+    "iterations": {
+      "rate": 173.62845218880457,
+      "count": 9990
+    }
+  }
+}

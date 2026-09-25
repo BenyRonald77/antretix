@@ -1,0 +1,92 @@
+{
+  "scenario": "2-spike-join",
+  "finishedAt": "2026-09-25T06:20:03.058Z",
+  "config": {
+    "vus": "3000",
+    "users": null,
+    "duration": null,
+    "qty": null,
+    "machine": "Ryzen 7 7445HS 6C/12T, 7.3GB RAM (Docker VM 3.5GB), 2x API + 2x worker, k6 di mesin yang sama"
+  },
+  "thresholds": {
+    "http_req_duration{name:status}": {
+      "p(95)<150": {
+        "ok": true
+      }
+    },
+    "http_req_failed{name:status}": {
+      "rate<0.01": {
+        "ok": true
+      }
+    },
+    "http_req_failed{name:join}": {
+      "rate<0.01": {
+        "ok": true
+      }
+    },
+    "http_req_duration{name:join}": {
+      "p(95)<300": {
+        "ok": true
+      }
+    }
+  },
+  "metrics": {
+    "http_reqs": {
+      "count": 33835,
+      "rate": 509.35112049785613
+    },
+    "http_req_failed": {
+      "rate": 0,
+      "passes": 0,
+      "fails": 33835
+    },
+    "http_req_duration": {
+      "med": 3.208512,
+      "p(90)": 33.67797180000011,
+      "p(95)": 110.93034409999997,
+      "p(99)": 230.2123056999997,
+      "max": 1112.473536,
+      "avg": 17.28453892862421
+    },
+    "http_req_duration{name:join}": {
+      "avg": 5.834946388999994,
+      "med": 3.3427309999999997,
+      "p(90)": 8.5285059,
+      "p(95)": 16.338552199999985,
+      "p(99)": 55.44560381999985,
+      "max": 126.825433
+    },
+    "http_req_duration{name:status}": {
+      "p(99)": 240.23680550000026,
+      "max": 1112.473536,
+      "avg": 18.354385856443223,
+      "med": 3.186689,
+      "p(90)": 39.294374,
+      "p(95)": 121.7504655
+    },
+    "http_req_failed{name:join}": {
+      "fails": 3000,
+      "rate": 0,
+      "passes": 0
+    },
+    "http_req_failed{name:status}": {
+      "fails": 30831,
+      "rate": 0,
+      "passes": 0
+    },
+    "checks": {
+      "rate": 1,
+      "passes": 33831,
+      "fails": 0
+    },
+    "vus_max": {
+      "max": 3000,
+      "value": 3000,
+      "min": 2585
+    },
+    "iterations": {
+      "count": 33831,
+      "rate": 509.2909046124714
+    }
+  }
+}

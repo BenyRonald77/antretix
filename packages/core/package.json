@@ -1,0 +1,23 @@
+{
+  "name": "@antretix/core",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@antretix/db": "workspace:*",
+    "@antretix/lua": "workspace:*",
+    "@antretix/shared": "workspace:*",
+    "ioredis": "^5.8.2",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "~5.9.3"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "scenario": "5-bot-attack",
+  "finishedAt": "2026-09-25T06:46:22.967Z",
+  "config": {
+    "vus": null,
+    "users": null,
+    "duration": null,
+    "qty": null,
+    "machine": "Ryzen 7 7445HS 6C/12T, 7.3GB RAM (Docker VM 3.5GB), 2x API + 2x worker, k6 di mesin yang sama"
+  },
+  "thresholds": {
+    "bot_blocked": {
+      "rate>0.95": {
+        "ok": true
+      }
+    },
+    "normal_join_ok": {
+      "rate==1": {
+        "ok": true
+      }
+    }
+  },
+  "metrics": {
+    "http_reqs": {
+      "count": 6305,
+      "rate": 103.69005466912637
+    },
+    "http_req_failed": {
+      "passes": 5975,
+      "fails": 330,
+      "rate": 0.9476605868358445
+    },
+    "http_req_duration": {
+      "avg": 14.741997531958747,
+      "med": 2.680042,
+      "p(95)": 79.98625659999996,
+      "p(99)": 306.77500248000007,
+      "max": 593.959414
+    },
+    "normal_join_ok": {
+      "fails": 0,
+      "rate": 1,
+      "passes": 300
+    },
+    "bot_blocked": {
+      "fails": 25,
+      "rate": 0.9958333333333333,
+      "passes": 5975
+    },
+    "checks": {
+      "rate": 1,
+      "passes": 300,
+      "fails": 0
+    },
+    "vus_max": {
+      "value": 350,
+      "min": 350,
+      "max": 350
+    },
+    "iterations": {
+      "count": 6300,
+      "rate": 103.60782623560604
+    }
+  }
+}

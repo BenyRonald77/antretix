@@ -1,0 +1,146 @@
+{
+  "scenario": "4-oversubscribe",
+  "finishedAt": "2026-09-25T06:59:22.479Z",
+  "config": {
+    "vus": "1000",
+    "users": "10000",
+    "duration": null,
+    "qty": null,
+    "machine": "Ryzen 7 7445HS 6C/12T, 7.3GB RAM (Docker VM 3.5GB), 2x API + 2x worker, k6 di mesin yang sama"
+  },
+  "thresholds": {
+    "flow_outcomes{outcome:SOLD_OUT}": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "flow_outcomes{outcome:TIMEOUT}": {
+      "count==0": {
+        "ok": true
+      }
+    },
+    "flow_outcomes{outcome:PAY_TIMEOUT}": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "flow_outcomes{outcome:OUT_OF_STOCK}": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "flow_outcomes{outcome:LIMIT_EXCEEDED}": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "flow_outcomes{outcome:ABANDONED}": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "oversold_categories": {
+      "value==0": {
+        "ok": true
+      }
+    },
+    "flow_outcomes{outcome:PAID}": {
+      "count>=0": {
+        "ok": true
+      }
+    }
+  },
+  "metrics": {
+    "http_reqs": {
+      "count": 64144,
+      "rate": 542.6365495177618
+    },
+    "http_req_failed": {
+      "rate": 0.07947742579196808,
+      "passes": 5098,
+      "fails": 59046
+    },
+    "http_req_duration": {
+      "p(95)": 1301.7316820999997,
+      "p(99)": 2535.71816017,
+      "max": 6506.949104,
+      "avg": 304.21782310293867,
+      "med": 101.1751375,
+      "p(90)": 877.9138404000005
+    },
+    "queue_wait_ms": {
+      "avg": 15402.580082336797,
+      "med": 16353,
+      "p(90)": 18891,
+      "p(95)": 19263,
+      "p(99)": 20064,
+      "max": 22252
+    },
+    "graceful_rejection": {
+      "passes": 5000,
+      "fails": 5000,
+      "rate": 0.5
+    },
+    "flow_outcomes": {
+      "count": 10000,
+      "rate": 84.59661847059144
+    },
+    "tickets_sold": {
+      "min": 5000,
+      "max": 5000,
+      "value": 5000
+    },
+    "tickets_reserved": {
+      "max": 0,
+      "value": 0,
+      "min": 0
+    },
+    "tickets_quota": {
+      "min": 5000,
+      "max": 5000,
+      "value": 5000
+    },
+    "oversold_categories": {
+      "value": 0,
+      "min": 0,
+      "max": 0
+    },
+    "vus_max": {
+      "value": 1000,
+      "min": 524,
+      "max": 1000
+    },
+    "iterations": {
+      "count": 10000,
+      "rate": 84.59661847059144
+    },
+    "flow_outcomes{outcome:OUT_OF_STOCK}": {
+      "count": 101,
+      "rate": 0.8544258465529735
+    },
+    "flow_outcomes{outcome:LIMIT_EXCEEDED}": {
+      "count": 0,
+      "rate": 0
+    },
+    "flow_outcomes{outcome:ABANDONED}": {
+      "rate": 0,
+      "count": 0
+    },
+    "flow_outcomes{outcome:PAID}": {
+      "count": 5000,
+      "rate": 42.29830923529572
+    },
+    "flow_outcomes{outcome:SOLD_OUT}": {
+      "count": 4899,
+      "rate": 41.44388338874275
+    },
+    "flow_outcomes{outcome:TIMEOUT}": {
+      "count": 0,
+      "rate": 0
+    },
+    "flow_outcomes{outcome:PAY_TIMEOUT}": {
+      "count": 0,
+      "rate": 0
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@antretix/worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/jobs.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/main.ts",
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@antretix/core": "workspace:*",
+    "@antretix/db": "workspace:*",
+    "@antretix/lua": "workspace:*",
+    "@antretix/shared": "workspace:*",
+    "ioredis": "^5.8.2",
+    "prom-client": "^15.1.3",
+    "tsx": "^4.21.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "~5.9.3"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@antretix/db",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
+    "migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
+    "migrate:reset": "dotenv -e ../../.env -- prisma migrate reset --force --skip-seed",
+    "seed": "dotenv -e ../../.env -- tsx src/seed.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@antretix/shared": "workspace:*",
+    "@prisma/client": "6.19.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "dotenv-cli": "^11.0.0",
+    "prisma": "6.19.3",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3"
+  }
+}

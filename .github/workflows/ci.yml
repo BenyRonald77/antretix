@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 22
+  PNPM_VERSION: 10.34.5
+
+jobs:
+  checks:
+    name: Lint, format, typecheck, unit test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm test:unit
+
+  integration:
+    name: Integration test (Testcontainers) + coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Testcontainers menyalakan PostgreSQL 16 dan Redis 7 asli lewat Docker bawaan runner.
+      - run: pnpm test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: antretix
+          POSTGRES_PASSWORD: antretix
+          POSTGRES_DB: antretix
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U antretix" --health-interval 3s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://antretix:antretix@localhost:5432/antretix?connection_limit=20
+      REDIS_URL: redis://localhost:6379
+      AUTH_JWT_SECRET: ci-auth-secret-0123456789abcdef
+      QUEUE_JWT_SECRET: ci-queue-secret-0123456789abcdef
+      PAYMENT_WEBHOOK_SECRET: ci-webhook-secret
+      PAYMENT_WEBHOOK_URL: http://localhost:4000/payments/webhook
+      LOADTEST_MODE: "true"
+      CORS_ORIGIN: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @antretix/db exec prisma migrate deploy
+      - run: pnpm --filter @antretix/db exec tsx src/seed.ts
+      - run: pnpm --filter @antretix/web build
+      - name: Start API, worker, web
+        run: |
+          pnpm --filter @antretix/api start > api.log 2>&1 &
+          pnpm --filter @antretix/worker start > worker.log 2>&1 &
+          pnpm --filter @antretix/web start > web.log 2>&1 &
+          npx wait-on --timeout 60000 http://localhost:4000/health http://localhost:3000
+      - run: pnpm --filter @antretix/web exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-logs
+          path: |
+            *.log
+            apps/web/test-results/

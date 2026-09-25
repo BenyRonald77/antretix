@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/*
+ * Identitas visual AntreTix (lihat DESIGN.md):
+ * kertas tiket (krem) + tinta (hitam hangat), satu aksen merah stempel untuk momen kunci
+ * (CTA utama dan nomor antrean). Radius kecil, tanpa bayangan kecuali dialog.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --paper: #f5efe3;
+  --paper-2: #ebe3d3;
+  --ink: #1d1b17;
+  --ink-2: #5b554b;
+  --rule: #cfc5b2;
+  --stamp: #b8321c;
+  --stamp-ink: #fff8ef;
+  --ok: #2f6b3a;
+  --warn: #8a5a00;
+  --danger: #a3261a;
+  /* Seri grafik admin (divalidasi dataviz: lightness, chroma, CVD, kontras). */
+  --series-sold: #b8321c;
+  --series-held: #1f6fa8;
+}
+
+:root[data-theme="dark"] {
+  --paper: #16140f;
+  --paper-2: #221f18;
+  --ink: #efe8da;
+  --ink-2: #aba292;
+  --rule: #3b362c;
+  --stamp: #e0573d;
+  --stamp-ink: #16140f;
+  --ok: #7cc288;
+  --warn: #e0b04f;
+  --danger: #f07a6a;
+  --series-sold: #e0573d;
+  --series-held: #3f8fd0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16140f;
+    --paper-2: #221f18;
+    --ink: #efe8da;
+    --ink-2: #aba292;
+    --rule: #3b362c;
+    --stamp: #e0573d;
+    --stamp-ink: #16140f;
+    --ok: #7cc288;
+    --warn: #e0b04f;
+    --danger: #f07a6a;
+    --series-sold: #e0573d;
+    --series-held: #3f8fd0;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-rule: var(--rule);
+  --color-stamp: var(--stamp);
+  --color-stamp-ink: var(--stamp-ink);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --color-series-sold: var(--series-sold);
+  --color-series-held: var(--series-held);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tepi sobekan tiket: satu-satunya motif dekoratif, dipakai di kartu tiket dan nomor antrean. */
+.perforated {
+  --hole: 11px;
+  background:
+    radial-gradient(
+        circle at 0 50%,
+        transparent var(--hole),
+        var(--paper-2) calc(var(--hole) + 0.5px)
+      )
+      left / 51% 100% no-repeat,
+    radial-gradient(
+        circle at 100% 50%,
+        transparent var(--hole),
+        var(--paper-2) calc(var(--hole) + 0.5px)
+      )
+      right / 51% 100% no-repeat;
+}
+
+.stub-rule {
+  border-top: 2px dashed var(--rule);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--stamp);
+  outline-offset: 2px;
+}
+
+input[type="radio"],
+input[type="checkbox"],
+input[type="range"] {
+  accent-color: var(--ink);
+}

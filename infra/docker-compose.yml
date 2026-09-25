@@ -1,0 +1,142 @@
+name: antretix
+
+x-app-env: &app-env
+  DATABASE_URL: postgresql://antretix:antretix@postgres:5432/antretix?connection_limit=${DB_POOL_SIZE:-20}&pool_timeout=10
+  REDIS_URL: redis://redis:6379
+  AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:-dev-auth-secret-ganti-di-produksi-0123456789}
+  QUEUE_JWT_SECRET: ${QUEUE_JWT_SECRET:-dev-queue-secret-ganti-di-produksi-0123456789}
+  PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:-dev-webhook-secret-0123456789}
+  # Lewat nginx agar webhook tersebar ke kedua instance API, bukan membebani satu pool koneksi saja.
+  PAYMENT_WEBHOOK_URL: http://nginx/api/payments/webhook
+  TURNSTILE_SECRET: ${TURNSTILE_SECRET:-1x0000000000000000000000000000000AA}
+  TURNSTILE_BYPASS: ${TURNSTILE_BYPASS:-false}
+  LOADTEST_MODE: ${LOADTEST_MODE:-false}
+  TRUST_PROXY: ${TRUST_PROXY:-1}
+  CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+  RL_JOIN_PER_MIN: ${RL_JOIN_PER_MIN:-5}
+  RL_STATUS_PER_MIN: ${RL_STATUS_PER_MIN:-30}
+  RL_CHECKOUT_PER_MIN: ${RL_CHECKOUT_PER_MIN:-10}
+  RL_GLOBAL_IP_PER_MIN: ${RL_GLOBAL_IP_PER_MIN:-120}
+  LOG_LEVEL: ${LOG_LEVEL:-warn}
+  HOLD_TTL_SEC: ${HOLD_TTL_SEC:-600}
+  SESSION_TTL_SEC: ${SESSION_TTL_SEC:-600}
+  NODE_ENV: production
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: antretix
+      POSTGRES_PASSWORD: antretix
+      POSTGRES_DB: antretix
+    command: ["postgres", "-c", "max_connections=200", "-c", "shared_buffers=256MB"]
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U antretix"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    # AOF agar antrean dan stok selamat dari restart biasa.
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
+    ports: ["6379:6379"]
+    volumes: ["redisdata:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    image: antretix-backend:latest
+    build: { context: .., dockerfile: infra/Dockerfile, target: backend }
+    environment: *app-env
+    command:
+      ["sh", "-c", "pnpm --filter @antretix/db migrate:deploy && pnpm --filter @antretix/db seed"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    profiles: ["app"]
+
+  api1: &api
+    image: antretix-backend:latest
+    environment: *app-env
+    command: ["pnpm", "--filter", "@antretix/api", "start"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    profiles: ["app"]
+
+  api2: *api
+
+  worker:
+    image: antretix-backend:latest
+    environment: *app-env
+    command: ["pnpm", "--filter", "@antretix/worker", "start"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    # Dua replika: satu menjadi leader admission, yang lain siaga mengambil alih.
+    deploy: { replicas: 2 }
+    profiles: ["app"]
+
+  web:
+    image: antretix-web:latest
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: web
+      args:
+        NEXT_PUBLIC_API_URL: /api
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-1x00000000000000000000AA}
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+    profiles: ["app"]
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports: ["8080:80"]
+    volumes: ["./nginx.conf:/etc/nginx/nginx.conf:ro"]
+    depends_on: [api1, api2, web]
+    profiles: ["app"]
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--web.enable-remote-write-receiver"]
+    ports: ["9090:9090"]
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    profiles: ["app", "observability"]
+
+  grafana:
+    image: grafana/grafana:12.1.0
+    ports: ["3001:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on: [prometheus]
+    profiles: ["app", "observability"]
+
+  # Load test: docker compose --env-file loadtest.env --profile app --profile loadtest run --rm k6 run /scripts/scenarios/<skenario>.js
+  k6:
+    image: grafana/k6:1.3.0
+    volumes: ["../loadtest:/scripts"]
+    environment:
+      BASE_URL: http://nginx/api
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:-dev-auth-secret-ganti-di-produksi-0123456789}
+      K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
+      K6_PROMETHEUS_RW_TREND_STATS: "p(95),p(99),avg,max"
+    depends_on: [nginx]
+    profiles: ["loadtest"]
+
+volumes:
+  pgdata:
+  redisdata:

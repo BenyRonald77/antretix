@@ -1,0 +1,46 @@
+{
+  "name": "antretix",
+  "private": true,
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter ./apps/** dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck && tsc -p tsconfig.json",
+    "lint": "oxlint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm --filter @antretix/web test:e2e",
+    "db:generate": "pnpm --filter @antretix/db generate",
+    "db:migrate": "pnpm --filter @antretix/db migrate:deploy",
+    "db:seed": "pnpm --filter @antretix/db seed",
+    "infra:up": "docker compose -f infra/docker-compose.yml up -d postgres redis",
+    "infra:down": "docker compose -f infra/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "@antretix/api": "workspace:*",
+    "@antretix/core": "workspace:*",
+    "@antretix/db": "workspace:*",
+    "@antretix/lua": "workspace:*",
+    "@antretix/shared": "workspace:*",
+    "@oxlint/plugins": "1.85.0",
+    "@testcontainers/postgresql": "^12.1.0",
+    "@testcontainers/redis": "^12.1.0",
+    "@types/node": "^22.20.4",
+    "@vitest/coverage-v8": "^5.0.1",
+    "ioredis": "^5.8.2",
+    "oxlint": "1.85.0",
+    "prettier": "^3.9.9",
+    "testcontainers": "^12.1.0",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.1"
+  },
+  "type": "module"
+}

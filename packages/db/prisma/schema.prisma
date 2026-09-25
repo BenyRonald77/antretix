@@ -1,0 +1,123 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  EXPIRED
+  CANCELLED
+  REFUNDED
+}
+
+enum EventStatus {
+  DRAFT
+  SCHEDULED
+  ON_SALE
+  SOLD_OUT
+  ENDED
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  role         Role     @default(CUSTOMER)
+  passwordHash String?
+  signupIp     String?
+  createdAt    DateTime @default(now())
+  orders       Order[]
+
+  @@index([signupIp])
+}
+
+model Event {
+  id          String           @id @default(cuid())
+  name        String
+  venue       String
+  description String           @default("")
+  posterUrl   String           @default("")
+  startsAt    DateTime
+  saleOpensAt DateTime
+  preQueueAt  DateTime
+  status      EventStatus      @default(DRAFT)
+  admitPerSec Int              @default(50)
+  maxActive   Int              @default(500)
+  maxPerUser  Int              @default(4)
+  createdAt   DateTime         @default(now())
+  categories  TicketCategory[]
+  orders      Order[]
+}
+
+model TicketCategory {
+  id         String      @id @default(cuid())
+  eventId    String
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name       String
+  price      Int
+  quota      Int
+  sold       Int         @default(0)
+  reserved   Int         @default(0)
+  sortOrder  Int         @default(0)
+  orderItems OrderItem[]
+
+  // CHECK (sold + reserved <= quota), sold >= 0, reserved >= 0 ditambahkan lewat migrasi SQL
+  @@index([eventId])
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  code           String      @unique
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  eventId        String
+  event          Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status         OrderStatus @default(PENDING)
+  totalPrice     Int
+  expiresAt      DateTime
+  idempotencyKey String      @unique
+  paymentRef     String?
+  paidAt         DateTime?
+  refundedAt     DateTime?
+  items          OrderItem[]
+  tickets        Ticket[]
+  createdAt      DateTime    @default(now())
+
+  @@index([status, expiresAt])
+  @@index([userId, eventId])
+  @@index([eventId, createdAt])
+}
+
+model OrderItem {
+  id         String         @id @default(cuid())
+  orderId    String
+  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   TicketCategory @relation(fields: [categoryId], references: [id])
+  qty        Int
+  unitPrice  Int
+
+  @@index([orderId])
+}
+
+model Ticket {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  categoryName String
+  code         String  @unique // isi QR
+  checkedIn    Boolean @default(false)
+
+  @@index([orderId])
+}

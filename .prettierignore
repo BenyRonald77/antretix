@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+.next
+node_modules
+coverage
+.agents
+.claude
+loadtest/results
+tools/oxlint
+PRD*.md

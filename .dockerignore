@@ -1,0 +1,14 @@
+**/node_modules
+**/.next
+**/coverage
+**/dist
+**/test-results
+**/playwright-report
+.git
+.env
+.env.*
+.agents
+.claude
+loadtest
+tools
+*.log
