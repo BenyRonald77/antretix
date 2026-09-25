@@ -1,7 +1,7 @@
 "use client";
 
 import { queueStateSchema, type QueueState } from "@antretix/shared";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { api, API_URL, ApiError, readToken } from "./api";
 import { readStorage, useStorageItem, writeStorage } from "./storage";
@@ -55,7 +55,9 @@ export function loadQueueToken(eventId: string): StoredQueueToken | null {
 export function useStoredQueueToken(eventId: string): StoredQueueToken | null | undefined {
   const raw = useStorageItem("session", tokenKey(eventId));
 
-  return raw === undefined ? undefined : parseStoredToken(raw);
+  // Di-memo berdasarkan string mentahnya: objek baru di setiap render akan memicu ulang effect
+  // yang bergantung padanya (misal polling stok di halaman checkout) tanpa henti.
+  return useMemo(() => (raw === undefined ? undefined : parseStoredToken(raw)), [raw]);
 }
 
 export function clearQueueToken(eventId: string): void {

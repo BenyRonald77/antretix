@@ -1,9 +1,7 @@
 {
   "uid": "antretix",
   "title": "AntreTix: War Tiket",
-  "tags": [
-    "antretix"
-  ],
+  "tags": ["antretix"],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 1,

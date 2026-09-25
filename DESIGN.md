@@ -10,16 +10,16 @@ terasa tenang dan jelas, bukan meriah.
 
 ## Warna
 
-| Token | Terang | Gelap | Dipakai untuk |
-| --- | --- | --- | --- |
-| `--paper` | `#f5efe3` | `#16140f` | Latar halaman |
-| `--paper-2` | `#ebe3d3` | `#221f18` | Permukaan tiket (stub), hover baris |
-| `--ink` | `#1d1b17` | `#efe8da` | Teks utama, progress bar, grafik satu seri |
-| `--ink-2` | `#5b554b` | `#aba292` | Teks sekunder, label sumbu |
-| `--rule` | `#cfc5b2` | `#3b362c` | Garis pemisah, border input |
-| `--stamp` | `#b8321c` | `#e0573d` | **Satu-satunya aksen**: tombol aksi utama per layar dan nomor antrean |
-| `--ok` / `--warn` / `--danger` | hijau / kuning tua / merah | versi terang | Status nyata saja (koneksi, peringatan, error) |
-| `--series-sold` / `--series-held` | `#b8321c` / `#1f6fa8` | `#e0573d` / `#3f8fd0` | Grafik stok admin (lolos validator dataviz: lightness, chroma, CVD, kontras) |
+| Token                             | Terang                     | Gelap                 | Dipakai untuk                                                                |
+| --------------------------------- | -------------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `--paper`                         | `#f5efe3`                  | `#16140f`             | Latar halaman                                                                |
+| `--paper-2`                       | `#ebe3d3`                  | `#221f18`             | Permukaan tiket (stub), hover baris                                          |
+| `--ink`                           | `#1d1b17`                  | `#efe8da`             | Teks utama, progress bar, grafik satu seri                                   |
+| `--ink-2`                         | `#5b554b`                  | `#aba292`             | Teks sekunder, label sumbu                                                   |
+| `--rule`                          | `#cfc5b2`                  | `#3b362c`             | Garis pemisah, border input                                                  |
+| `--stamp`                         | `#b8321c`                  | `#e0573d`             | **Satu-satunya aksen**: tombol aksi utama per layar dan nomor antrean        |
+| `--ok` / `--warn` / `--danger`    | hijau / kuning tua / merah | versi terang          | Status nyata saja (koneksi, peringatan, error)                               |
+| `--series-sold` / `--series-held` | `#b8321c` / `#1f6fa8`      | `#e0573d` / `#3f8fd0` | Grafik stok admin (lolos validator dataviz: lightness, chroma, CVD, kontras) |
 
 Aturan: aksen merah hanya muncul di **satu tempat per layar**. Tidak ada gradien, glow, atau glassmorphism.
 

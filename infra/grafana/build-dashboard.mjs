@@ -37,7 +37,14 @@ function panel(title, description, targets, gridPos, unit = "short", extra = {})
 }
 
 function row(title, y) {
-  return { id: nextId++, type: "row", title, collapsed: false, gridPos: { h: 1, w: 24, x: 0, y }, panels: [] };
+  return {
+    id: nextId++,
+    type: "row",
+    title,
+    collapsed: false,
+    gridPos: { h: 1, w: 24, x: 0, y },
+    panels: [],
+  };
 }
 
 const w = 12;
@@ -90,7 +97,12 @@ const panels = [
   panel(
     "Request per detik menurut status HTTP",
     "Lonjakan 5xx berarti sistem kewalahan; 429 berarti rate limiter bekerja.",
-    [['sum by (status) (rate(antretix_http_request_duration_seconds_count{route!="/metrics"}[30s]))', "{{status}}"]],
+    [
+      [
+        'sum by (status) (rate(antretix_http_request_duration_seconds_count{route!="/metrics"}[30s]))',
+        "{{status}}",
+      ],
+    ],
     { h, w, x: w, y: 19 },
     "reqps",
   ),
