@@ -12,3 +12,4 @@ loadtest/results/raw
 
 # Salinan symlink dari .agents/skills (dibuat ulang oleh `npx skills add`)
 .claude/
+*.tsbuildinfo
